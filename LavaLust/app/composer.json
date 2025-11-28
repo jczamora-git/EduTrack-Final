@@ -1,0 +1,14 @@
+{
+    "require": {
+        "phpoffice/phpspreadsheet": "^5.2",
+        "phpmailer/phpmailer": "^7.0",
+        "mpdf/mpdf": "^8.2",
+        "firebase/php-jwt": "^6.11"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.org"
+        }
+    }
+}

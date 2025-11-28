@@ -1,0 +1,235 @@
+<?php
+defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
+/**
+ * ------------------------------------------------------------------
+ * LavaLust - an opensource lightweight PHP MVC Framework
+ * ------------------------------------------------------------------
+ *
+ * MIT License
+ *
+ * Copyright (c) 2020 Ronald M. Marasigan
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package LavaLust
+ * @author Ronald M. Marasigan <ronald.marasigan@yahoo.com>
+ * @since Version 1
+ * @link https://github.com/ronmarasigan/LavaLust
+ * @license https://opensource.org/licenses/MIT MIT License
+ */
+
+/*
+| -------------------------------------------------------------------
+| URI ROUTING
+| -------------------------------------------------------------------
+| Here is where you can register web routes for your application.
+|
+|
+*/
+
+$router->get('/', 'Welcome::index');
+
+// Auth Routes (Both API and Web)
+$router->match('/auth/login', 'UserController::login', ['GET', 'POST']);
+$router->match('/auth/register', 'UserController::register', ['GET', 'POST']);
+$router->get('/auth/logout', 'UserController::logout');
+// Password reset web page (simple server-side form)
+$router->match('/auth/reset', 'UserController::reset', ['GET', 'POST']);
+
+// API Routes - Authentication
+$router->post('/api/auth/register', 'UserController::api_register');
+$router->post('/api/auth/login', 'UserController::api_login');
+$router->post('/api/auth/logout', 'UserController::api_logout');
+$router->get('/api/auth/me', 'UserController::me');
+$router->get('/api/auth/check', 'UserController::check');
+// Password reset request (sends reset email)
+$router->post('/api/auth/request-reset', 'UserController::api_request_password_reset');
+// API endpoint to accept token and new password
+$router->post('/api/auth/reset-password', 'UserController::api_reset_password');
+// API endpoint to send welcome email when a user is created by admin
+$router->post('/api/auth/send-welcome-email', 'UserController::api_send_welcome_email');
+
+// API Routes - User Management (Admin only)
+$router->get('/api/users', 'UserController::api_get_users');
+$router->get('/api/users/{id}', 'UserController::api_get_user')->where_number('id');
+$router->post('/api/users', 'UserController::api_create_user');
+$router->put('/api/users/{id}', 'UserController::api_update_user')->where_number('id');
+$router->delete('/api/users/{id}', 'UserController::api_delete_user')->where_number('id');
+// API Routes - Firebase Cloud Messaging (FCM token registration)
+$router->post('/api/users/register-fcm-token', 'UserController::api_register_fcm_token');
+// Debug route to list current user's FCM tokens (development only)
+$router->get('/api/debug/my-fcm-tokens', 'UserController::api_list_my_fcm_tokens');
+// Debug route to send a test FCM notification to current user
+$router->post('/api/debug/send-test-notification', 'UserController::api_send_test_notification');
+
+// API Routes - Teacher Management (Admin only)
+$router->get('/api/teachers', 'TeacherController::api_get_teachers');
+$router->get('/api/teachers/stats', 'TeacherController::api_teacher_stats');
+$router->get('/api/teachers/last-id', 'TeacherController::api_get_last_id');
+$router->get('/api/teachers/{id}', 'TeacherController::api_get_teacher')->where_number('id');
+// Public/student-accessible teacher info
+$router->get('/api/teachers/{id}/public', 'TeacherController::api_get_public_teacher')->where_number('id');
+$router->post('/api/teachers', 'TeacherController::api_create_teacher');
+$router->put('/api/teachers/{id}', 'TeacherController::api_update_teacher')->where_number('id');
+$router->delete('/api/teachers/{id}', 'TeacherController::api_delete_teacher')->where_number('id');
+
+// API Routes - Student Management (Admin only)
+$router->get('/api/students', 'StudentController::api_get_students');
+$router->get('/api/students/stats', 'StudentController::api_get_stats');
+$router->get('/api/students/last-id', 'StudentController::api_get_last_id');
+$router->get('/api/students/by-user/{user_id}', 'StudentController::api_get_by_user_id')->where_number('user_id');
+$router->get('/api/students/{id}/courses', 'StudentController::api_get_courses_for_student')->where_number('id');
+$router->get('/api/students/{id}/courses/teachers', 'StudentController::api_get_course_teachers')->where_number('id');
+$router->get('/api/students/{id}/activities', 'StudentController::api_get_activities_for_student')->where_number('id');
+$router->get('/api/students/{id}/courses-activities', 'StudentController::api_get_courses_activities')->where_number('id');
+$router->get('/api/students/{id}', 'StudentController::api_get_student')->where_number('id');
+$router->post('/api/students', 'StudentController::api_create_student');
+$router->get('/api/students/export', 'StudentController::api_export_students');
+$router->post('/api/students/import', 'StudentController::api_import_students');
+$router->put('/api/students/{id}', 'StudentController::api_update_student')->where_number('id');
+$router->delete('/api/students/{id}', 'StudentController::api_delete_student')->where_number('id');
+// API endpoint to send welcome email to a newly created student
+$router->post('/api/students/send-welcome-email', 'StudentController::api_send_welcome_email');
+
+// API Routes - Student Grades (Student accessible)
+$router->get('/api/student/grades-summary', 'StudentController::api_grades_summary');
+
+// Tools / Utilities
+$router->get('/tools/generate-students', 'Tools::generate_students');
+
+// API Routes - Sections (Admin only)
+$router->get('/api/sections', 'SectionController::api_get_sections');
+$router->get('/api/sections/{id}', 'SectionController::api_get_section')->where_number('id');
+$router->post('/api/sections', 'SectionController::api_create_section');
+$router->post('/api/sections/with-year-level', 'SectionController::api_create_section_with_year_level');
+$router->put('/api/sections/{id}', 'SectionController::api_update_section')->where_number('id');
+$router->delete('/api/sections/{id}', 'SectionController::api_delete_section')->where_number('id');
+
+// API Routes - Year Levels (Admin only)
+$router->get('/api/year-levels', 'SectionController::api_get_year_levels');
+$router->get('/api/year-levels/{id}/sections', 'SectionController::api_get_year_level_sections')->where_number('id');
+
+// API Routes - Year Level Sections (Admin only)
+$router->get('/api/year-level-sections', 'SectionController::api_get_all_year_level_sections');
+$router->post('/api/year-levels/{yearLevelId}/sections/{sectionId}', 'SectionController::api_assign_section_to_year_level')->where_number(['yearLevelId', 'sectionId']);
+$router->delete('/api/year-levels/{yearLevelId}/sections/{sectionId}', 'SectionController::api_unassign_section_from_year_level')->where_number(['yearLevelId', 'sectionId']);
+
+// API Routes - Subjects (Admin only)
+$router->get('/api/subjects', 'SubjectController::api_get_subjects');
+$router->get('/api/subjects/{id}', 'SubjectController::api_get_subject')->where_number('id');
+$router->post('/api/subjects', 'SubjectController::api_create_subject');
+$router->put('/api/subjects/{id}', 'SubjectController::api_update_subject')->where_number('id');
+$router->delete('/api/subjects/{id}', 'SubjectController::api_delete_subject')->where_number('id');
+
+// API Routes - Subjects (Student accessible)
+$router->get('/api/subjects/for-student', 'SubjectController::api_get_for_student');
+
+// API Routes - Teacher Assignments (Admin only)
+$router->post('/api/teacher-assignments', 'TeacherAssignmentController::api_assign_subjects');
+$router->get('/api/teacher-assignments/my', 'TeacherAssignmentController::api_get_mine');
+$router->get('/api/teacher-assignments/by-teacher/{teacher_id}', 'TeacherAssignmentController::api_get_by_teacher')->where_number('teacher_id');
+$router->get('/api/teacher-assignments', 'TeacherAssignmentController::api_get_all');
+// Remove a single teacher_subject -> section mapping
+$router->post('/api/teacher-assignments/remove-section', 'TeacherAssignmentController::api_remove_section');
+// Remove an entire teacher_subject assignment
+$router->post('/api/teacher-assignments/remove-assignment', 'TeacherAssignmentController::api_remove_assignment');
+
+// API Routes - Teacher Assignments (Student accessible)
+$router->get('/api/teacher-assignments/for-student', 'TeacherAssignmentController::api_get_for_student');
+
+// API Routes - Student Subjects (Enrollments)
+$router->get('/api/student-subjects', 'StudentSubjectController::api_get');
+$router->post('/api/student-subjects', 'StudentSubjectController::api_create');
+$router->post('/api/student-subjects/delete', 'StudentSubjectController::api_delete');
+
+// API Routes - Activities (Grade Transparency)
+$router->get('/api/activities', 'ActivityController::api_get_activities');
+$router->get('/api/teacher/activities/with-grades', 'ActivityController::api_get_teacher_activities_with_graded_counts');
+$router->get('/api/activities/course/with-stats', 'ActivityController::api_get_course_activities_with_stats');
+$router->get('/api/activities/student-grades', 'ActivityController::api_get_student_activities_with_grades');
+$router->get('/api/activities/student-all', 'ActivityController::api_get_all_student_activities_with_grades');
+$router->get('/api/activities/export-class-record', 'ActivityController::api_export_class_record');
+$router->get('/api/activities/export-class-record-excel', 'ActivityController::api_export_class_record_excel');
+$router->get('/api/activities/{id}', 'ActivityController::api_get_activity')->where_number('id');
+$router->post('/api/activities', 'ActivityController::api_create_activity');
+$router->put('/api/activities/{id}', 'ActivityController::api_update_activity')->where_number('id');
+$router->delete('/api/activities/{id}', 'ActivityController::api_delete_activity')->where_number('id');
+$router->get('/api/activities/{id}/grades', 'ActivityController::api_get_activity_grades')->where_number('id');
+$router->post('/api/activities/{id}/grades', 'ActivityController::api_set_grade')->where_number('id');
+// Generic activity grades query (filter by activity_id and/or student_id)
+$router->get('/api/activity-grades', 'ActivityController::api_get_activity_grades_by_params');
+
+// API Routes - Academic Periods
+$router->get('/api/academic-periods', 'AcademicPeriodController::api_get_periods');
+$router->get('/api/academic-periods/stats', 'AcademicPeriodController::api_get_stats');
+$router->get('/api/academic-periods/active', 'AcademicPeriodController::api_get_active');
+$router->get('/api/academic-periods/active-public', 'AcademicPeriodController::api_get_active_public');
+$router->get('/api/academic-periods/grading-context', 'AcademicPeriodController::api_get_grading_context');
+$router->get('/api/academic-periods/current-subjects', 'AcademicPeriodController::api_get_current_subjects');
+$router->get('/api/academic-periods/{id}', 'AcademicPeriodController::api_get_period')->where_number('id');
+$router->post('/api/academic-periods', 'AcademicPeriodController::api_create_period');
+$router->put('/api/academic-periods/{id}', 'AcademicPeriodController::api_update_period')->where_number('id');
+$router->post('/api/academic-periods/{id}/set-active', 'AcademicPeriodController::api_set_active')->where_number('id');
+$router->delete('/api/academic-periods/{id}', 'AcademicPeriodController::api_delete_period')->where_number('id');
+
+// API Routes - Announcements (Admin)
+$router->get('/api/announcements', 'AnnouncementController::api_get_announcements');
+$router->get('/api/announcements/{id}', 'AnnouncementController::api_get_announcement')->where_number('id');
+$router->post('/api/announcements', 'AnnouncementController::api_create_announcement');
+$router->put('/api/announcements/{id}', 'AnnouncementController::api_update_announcement')->where_number('id');
+$router->delete('/api/announcements/{id}', 'AnnouncementController::api_delete_announcement')->where_number('id');
+
+// API Routes - Campuses (Admin)
+$router->get('/api/campuses', 'CampusController::api_get_campuses');
+$router->get('/api/campuses/{id}', 'CampusController::api_get_campus')->where_number('id');
+$router->post('/api/campuses', 'CampusController::api_create_campus');
+$router->put('/api/campuses/{id}', 'CampusController::api_update_campus')->where_number('id');
+$router->delete('/api/campuses/{id}', 'CampusController::api_delete_campus')->where_number('id');
+
+// API Routes - Attendance (Teacher & Student)
+$router->post('/api/attendance/mark', 'AttendanceController::api_mark_attendance');
+$router->get('/api/attendance/student/{student_id}', 'AttendanceController::api_get_student_attendance')->where_number('student_id');
+$router->get('/api/attendance/course/{course_id}', 'AttendanceController::api_get_course_attendance')->where_number('course_id');
+$router->get('/api/attendance/today', 'AttendanceController::api_get_today_attendance');
+
+// API Routes - PDF Report Generation (Admin/Teacher)
+$router->get('/api/reports/students', 'ReportController::api_get_students');
+$router->get('/api/reports/student/{student_id}/pdf', 'ReportController::api_generate_student_report')->where_number('student_id');
+$router->get('/api/reports/debug/student/{student_id}/grades', 'ReportController::api_debug_student_grades')->where_number('student_id');
+$router->post('/api/reports/bulk/pdf', 'ReportController::api_generate_bulk_reports');
+
+// API Routes - Final Grades (Teacher)
+$router->post('/api/final-grades/submit', 'FinalGradesController::api_submit_grades');
+$router->get('/api/final-grades', 'FinalGradesController::api_get_final_grades');
+
+// API Routes - Messages (Student & Teacher)
+$router->get('/api/messages', 'MessageController::api_get_inbox');
+$router->post('/api/messages', 'MessageController::api_send_message');
+$router->get('/api/messages/{id}', 'MessageController::api_get_message')->where_number('id');
+$router->put('/api/messages/{id}/read', 'MessageController::api_mark_as_read')->where_number('id');
+$router->get('/api/messages/conversation/{user_id}', 'MessageController::api_get_conversation')->where_number('user_id');
+$router->delete('/api/messages/{id}', 'MessageController::api_delete_message')->where_number('id');
+
+// API Routes - Broadcasts (Teacher & Admin)
+$router->get('/api/broadcasts/my', 'BroadcastController::api_get_my_broadcasts');
+$router->post('/api/broadcasts', 'BroadcastController::api_create_broadcast');
+$router->get('/api/broadcasts/{id}', 'BroadcastController::api_get_broadcast')->where_number('id');
+$router->get('/api/broadcasts/subject/{subject_id}', 'BroadcastController::api_get_broadcasts_by_subject')->where_number('subject_id');
+$router->get('/api/broadcasts/section/{section_id}', 'BroadcastController::api_get_broadcasts_by_section')->where_number('section_id');
+$router->delete('/api/broadcasts/{id}', 'BroadcastController::api_delete_broadcast')->where_number('id');
