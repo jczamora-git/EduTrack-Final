@@ -133,6 +133,18 @@ const AppContent = () => {
   );
 };
 
+// Determine router basename from Vite base (import.meta.env.BASE_URL)
+const routerBase = (() => {
+  try {
+    const b = String(import.meta.env.BASE_URL || '/');
+    // remove trailing slash except for root
+    if (b === '/') return '/';
+    return b.replace(/\/$/, '');
+  } catch (e) {
+    return '/';
+  }
+})();
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider
@@ -145,13 +157,13 @@ const App = () => (
         <Toaster />
         <Sonner />
         <NotificationProvider>
-          <BrowserRouter>
+          <BrowserRouter basename={routerBase}>
             <AuthProvider>
               <ConfirmProvider>
                 <AppContent />
               </ConfirmProvider>
             </AuthProvider>
-          </BrowserRouter>
+            </BrowserRouter>
         </NotificationProvider>
       </TooltipProvider>
     </ThemeProvider>

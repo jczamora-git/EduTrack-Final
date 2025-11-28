@@ -15,6 +15,8 @@ const httpsConfig = fs.existsSync(certPath) && fs.existsSync(keyPath)
   : undefined;
 
 export default defineConfig(({ mode }) => ({
+  // Set base path for production (when deployed to /ui/)
+  base: mode === 'production' ? '/ui/' : '/',
   server: {
     host: "::",
     https: httpsConfig,
