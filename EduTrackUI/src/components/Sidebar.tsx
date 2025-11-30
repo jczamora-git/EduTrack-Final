@@ -170,7 +170,7 @@ export const Sidebar = () => {
       {/* Mobile Header with Hamburger */}
       <div className="md:hidden fixed top-0 left-0 right-0 bg-background border-b border-border z-30 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <img src="/vector.png" alt="EduTrack logo" className="h-6 w-6" />
+          <img src={`${import.meta.env.BASE_URL}vector.png`} alt="EduTrack logo" className="h-6 w-6" />
           <span className="text-lg font-bold text-blue-700">EduTrack</span>
         </div>
         <Button
@@ -352,7 +352,7 @@ export const Sidebar = () => {
         <div className="p-4 sm:p-6 flex justify-between items-center">
           {isOpen && (
             <div className="flex items-center gap-2">
-              <img src="/vector.png" alt="EduTrack logo" className="h-5 sm:h-6 w-5 sm:w-6" />
+              <img src={`${import.meta.env.BASE_URL}vector.png`} alt="EduTrack logo" className="h-5 sm:h-6 w-5 sm:w-6" />
               <span className="text-lg sm:text-xl font-bold text-blue-700 truncate">EduTrack</span>
             </div>
           )}

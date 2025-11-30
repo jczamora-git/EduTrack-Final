@@ -120,7 +120,7 @@ const Auth = () => {
         <Link to="/" className="flex items-center justify-center gap-2 mb-8 hover:opacity-80 transition-opacity">
           {/* Replace the icon with the project logo. Put your logo file at `public/logo.png` or
               `src/assets/logo.png` and update the src path below if needed. */}
-          <img src="../public/logo.png" alt="EduTrack logo" className="h-12 object-contain" />
+          <img src={`${import.meta.env.BASE_URL}logo.png`} alt="EduTrack logo" className="h-12 object-contain" />
         </Link>
 
         <Tabs defaultValue="signin" className="w-full">
